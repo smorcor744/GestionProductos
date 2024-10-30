@@ -1,0 +1,40 @@
+1º Login
+2º App Stock control
+    1. Alta Productos
+    2. Baja Productos
+    3. Modificacion nombre Productos
+    4. Modificacion stock Productos
+    5. Obtener 1 producto
+    6. Obtener productos con stock
+    7. Obtener productos sin stock
+    8. Get proveedor de 1 producto
+    9. Get todos los proveedores
+
+Clases:
+
+
+Usuario{
+nombreUsuario: String -> PK
+password: String -> not null, length 20}
+
+Producto{
+id: String -> PK
+categoria: String
+nombre: String
+descripcion: String
+precio-sin_iva: float
+precio_con_iva: float
+fecha_alta: Date
+stock: Int
+proveedor: Proveedor}
+
+Proveedro{
+id: Long ->Pk
+nombre: String
+direccion: String
+productos: List<Productos>}
+
+para el producto
+id -> 3 primeras letras de cada: categoria+nombre+proveedor
+precio_con_iva -> 21%
+fecha-alta -> hoy
