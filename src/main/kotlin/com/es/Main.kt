@@ -1,54 +1,101 @@
-package org.ventanas.com.es.hibernate
+package com.es
 
+import com.es.dao.ProductoDAO
+import com.es.dao.ProveedorDAO
+import com.es.dao.UsuarioDAO
+import com.es.service.StockControlApp
+import utils.Consola
 
-import com.es.model.Producto
-import com.es.model.Proveedor
-import com.es.model.Usuario
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
-import jakarta.persistence.Persistence
 
 fun main() {
-    val emf: EntityManagerFactory = Persistence.createEntityManagerFactory("unidadMySQL")
-    val em: EntityManager = emf.createEntityManager()
+    val consola = Consola()
 
-    em.transaction.begin()
 
-    // Crear y persistir instancias de Usuario
-    val usuario1 = Usuario("pepe123", "1234")
-    em.persist(usuario1)
+    val productoDAO = ProductoDAO(consola)
+    val proveedorDAO = ProveedorDAO(consola)
+    val usuarioDAO = UsuarioDAO(consola)
 
-    val usuario2 = Usuario("juan456", "password")
-    em.persist(usuario2)
+    val stockControlApp = StockControlApp(productoDAO, consola, usuarioDAO, proveedorDAO)
 
-    val proveedor1 = Proveedor(1L, "Proveedor1", "Dirección 123", null)
-    em.persist(proveedor1)
+    while (true) {
+        consola.write("=== Menú de Control de Stock ===")
+        consola.write("1. Alta Producto")
+        consola.write("2. Baja Producto")
+        consola.write("3. Modificación Nombre Producto")
+        consola.write("4. Modificación Stock Producto")
+        consola.write("5. Obtener Producto")
+        consola.write("6. Obtener Productos con Stock")
+        consola.write("7. Obtener Productos sin Stock")
+        consola.write("8. Obtener Proveedor de Producto")
+        consola.write("9. Obtener Todos los Proveedores")
+        consola.write("0. Salir")
+        consola.write("Seleccione una opción: ")
 
-    val proveedor2 = Proveedor(2L, "Proveedor2", "Dirección 456", null)
-    em.persist(proveedor2)
+        val opcion = consola.readNumber()
 
-    val producto1 = Producto(
-        id = "elelapro1",
-        categoria = "electronica",
-        nombre = "laptop",
-        descripcion = "Laptop de alta gama",
-        precio_sin_iva = 1000.0f,
-        proveedor = proveedor1,
-        stock = 10
-    )
-    em.persist(producto1)
+        when (opcion) {
+            1 -> {
+                consola.write("Ingrese el nombre del producto:")
+                val nombre = consola.read()
+                consola.write("Ingrese la categoría del producto:")
+                val categoria = consola.read()
+                consola.write("Ingrese la descripción del producto (opcional):")
+                val descripcion = consola.read()
+                consola.write("Ingrese el precio sin IVA:")
+                val precioSinIva = consola.readNumber()
+                consola.write("Ingrese el stock:")
+                val stock = consola.readNumber()
+                consola.write("Ingrese el ID del proveedor:")
+                val proveedorId = consola.read()
 
-    val producto2 = Producto(
-        id = "elarespro2",
-        categoria = "electronica",
-        nombre = "resistencia",
-        descripcion = "Resistencia para dispositivos electrónicos",
-        precio_sin_iva = 5.0f,
-        proveedor = proveedor2,
-        stock = 100
-    )
-    em.persist(producto2)
-
-    em.transaction.commit()
-    em.close()
+                stockControlApp.altaProducto(nombre, categoria, descripcion,
+                    precioSinIva?.toFloat() ?: 0.0f, stock, proveedorId)
+            }
+            2 -> {
+                consola.write("Ingrese el ID del producto a eliminar:")
+                val id = consola.read()
+                stockControlApp.bajaProducto(id)
+            }
+            3 -> {
+                consola.write("Ingrese el ID del producto a modificar:")
+                val id = consola.read()
+                consola.write("Ingrese el nuevo nombre del producto:")
+                val nuevoNombre = consola.read()
+                stockControlApp.modificarNombreProducto(id, nuevoNombre)
+            }
+            4 -> {
+                consola.write("Ingrese el ID del producto a modificar:")
+                val id = consola.read()
+                consola.write("Ingrese el nuevo stock del producto:")
+                val nuevoStock = consola.readNumber()
+                stockControlApp.modificarStockProducto(id, nuevoStock)
+            }
+            5 -> {
+                consola.write("Ingrese el ID del producto a obtener:")
+                val id = consola.read()
+                stockControlApp.obtenerProducto(id)
+            }
+            6 -> {
+                stockControlApp.obtenerProductosConStock()
+            }
+            7 -> {
+                stockControlApp.obtenerProductosSinStock()
+            }
+            8 -> {
+                consola.write("Ingrese el ID del producto:")
+                val id = consola.read()
+                stockControlApp.obtenerProveedorDeProducto(id)
+            }
+            9 -> {
+                stockControlApp.obtenerTodosLosProveedores()
+            }
+            0 -> {
+                consola.write("Saliendo de la aplicación...")
+                break
+            }
+            else -> {
+                consola.write("Opción no válida. Intente de nuevo.")
+            }
+        }
+    }
 }

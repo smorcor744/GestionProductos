@@ -5,54 +5,43 @@ import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.Persistence
 
 object HibernateUtils {
-    val emf: EntityManagerFactory = Persistence.createEntityManagerFactory("unidadMySQL")
-    val em: EntityManager = emf.createEntityManager()
 
+    private const val PERSISTENCE_UNIT_NAME = "unidadMySQL"
 
-    private fun createEntityFactory(persistence: String): EntityManagerFactory? {
-        try {
-            return Persistence.createEntityManagerFactory(persistence)
-        } catch (e:Exception){
-            println(e.message)
-            return null
+    private val emf: EntityManagerFactory = buildEntityManagerFactory()
+
+    private fun buildEntityManagerFactory(): EntityManagerFactory {
+        return try {
+            Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME)
+        } catch (e: Exception) {
+            println("Error al crear EntityManagerFactory: ${e.message}")
+            throw RuntimeException("No se pudo inicializar EntityManagerFactory", e)
         }
-
-
-    }
-    fun createEntityManager(persistence: String): EntityManager? {
-        try {
-            return createEntityFactory(persistence)?.createEntityManager()
-        } catch (e:Exception){
-            println(e.message)
-            return null
-        }
-
-
     }
 
+    fun createEntityManager(): EntityManager {
+        return emf.createEntityManager()
+    }
 
-    fun closeEntityFactory(entityManagerFactory: EntityManagerFactory){
+    fun closeEntityManager(em: EntityManager?) {
         try {
-            if (entityManagerFactory.isOpen){
-                entityManagerFactory.close()
+            em?.let {
+                if (it.isOpen) {
+                    it.close()
+                }
             }
-        } catch (e:Exception){
-            println(e.message)
+        } catch (e: Exception) {
+            println("Error al cerrar EntityManager: ${e.message}")
         }
-
-
     }
 
-
-
-    fun closeEntityManager(entityManager: EntityManager){
+    fun close() {
         try {
-            if (entityManager.isOpen){
-                entityManager.close()
+            if (emf.isOpen) {
+                emf.close()
             }
-        } catch (e:Exception){
-            println(e.message)
+        } catch (e: Exception) {
+            println("Error al cerrar EntityManagerFactory: ${e.message}")
         }
-
     }
 }

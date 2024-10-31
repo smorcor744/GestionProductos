@@ -9,13 +9,13 @@ import java.util.*
 class Producto(
 
     @Id
-    val id:String?,
+    var id: String = "",
 
     @Column(nullable = false)
-    val categoria:String,
+    val categoria: String,
 
     @Column(nullable = false, unique = true)
-    val nombre:String,
+    val nombre: String,
 
     @Column
     val descripcion: String,
@@ -30,14 +30,17 @@ class Producto(
     val fecha_alta: Date = Date.from(Instant.now()),
 
     @Column
-    val stock: Int,
+    val stock: Int?,
 
     @ManyToOne(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
-//    @JoinColumn(name = "id_producto")
+    @JoinColumn(name = "proveedor_id", nullable = false)
     val proveedor: Proveedor
 
 ){
-    fun generarId(): String {
+    init {
+        id = generarId()
+    }
+    private fun generarId(): String {
         val lista= mutableListOf<String>()
         val nom = nombre.split("")
         val cat = categoria.split("")

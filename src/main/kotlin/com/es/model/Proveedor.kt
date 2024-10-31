@@ -4,20 +4,17 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "proveedores")
-class Proveedor (
+class Proveedor(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id : Long?,
+    val id: Long,
 
     @Column(nullable = false, unique = true)
-    val nombre:String,
+    val nombre: String,
 
     @Column
-    val direccion:String,
+    val direccion: String? = null,
 
-    @OneToMany(mappedBy = "proveedor" )
-//    @JoinColumn
-    val productos:List<Producto>?
-
-
+    @OneToMany(mappedBy = "proveedor", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val productos: List<Producto> = emptyList()
 )
