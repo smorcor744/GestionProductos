@@ -52,7 +52,7 @@ class ProductoDAO(private val consola: Consola) {
             if (productoBD != null) {
                 productoBD
             } else {
-                Consola().write("Producto no encontrado")
+                consola.write("Producto no encontrado")
                 null
             }
         }
